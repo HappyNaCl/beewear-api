@@ -24,27 +24,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String token = extractToken(request)
-                .orElseThrow(UnauthorizedException::new);
+        extractToken(request).ifPresent(token -> {
+            if (!validatorPort.validateAccessToken(token)) {
+                throw new UnauthorizedException();
+            }
 
-        if (!validatorPort.validateAccessToken(token)) {
-            throw new UnauthorizedException();
-        }
+            UUID userId = validatorPort.getAccessTokenSubject(token);
 
-        UUID userId = validatorPort.getAccessTokenSubject(token);
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        });
 
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        return path.startsWith("/api/v1/auth/");
     }
 
     private Optional<String> extractToken(HttpServletRequest request) {

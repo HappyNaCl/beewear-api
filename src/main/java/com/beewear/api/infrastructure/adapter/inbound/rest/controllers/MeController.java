@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/me")
+@RequestMapping("/me")
 @Tag(name = "Me API", description = "API for current user operations")
 public class MeController {
 
