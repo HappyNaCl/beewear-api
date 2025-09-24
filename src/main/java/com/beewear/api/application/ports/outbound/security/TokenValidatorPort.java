@@ -6,5 +6,6 @@ public interface TokenValidatorPort {
     boolean validateAccessToken(String accessToken);
     boolean validateRefreshToken(String refreshToken);
 
-    UUID getSubject(String token);
+    UUID getAccessTokenSubject(String token);
+    UUID getRefreshTokenSubject(String token);
 }

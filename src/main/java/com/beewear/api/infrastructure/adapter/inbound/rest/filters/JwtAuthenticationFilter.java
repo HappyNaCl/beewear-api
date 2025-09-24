@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new UnauthorizedException();
         }
 
-        UUID userId = validatorPort.getSubject(token);
+        UUID userId = validatorPort.getAccessTokenSubject(token);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());

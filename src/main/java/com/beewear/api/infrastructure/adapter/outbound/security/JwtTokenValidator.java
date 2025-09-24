@@ -6,11 +6,13 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtTokenValidator implements TokenValidatorPort {
 
@@ -23,13 +25,23 @@ public class JwtTokenValidator implements TokenValidatorPort {
 
     @Override
     public boolean validateRefreshToken(String refreshToken) {
+        log.debug("Secret: {}", jwtProperties.getRefreshTokenSecret());
         return validateToken(refreshToken, jwtProperties.getRefreshTokenSecret());
     }
 
     @Override
-    public UUID getSubject(String token) {
+    public UUID getAccessTokenSubject(String token) {
+        return getSubject(token, jwtProperties.getAccessTokenSecret());
+    }
+
+    @Override
+    public UUID getRefreshTokenSubject(String token) {
+        return getSubject(token, jwtProperties.getRefreshTokenSecret());
+    }
+
+    private UUID getSubject(String token, String secret) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(jwtProperties.getAccessTokenSecret().getBytes(StandardCharsets.UTF_8)))
+                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -1,26 +1,28 @@
 package com.beewear.api.application.services;
 
 import com.beewear.api.application.ports.inbound.auth.LoginUseCase;
+import com.beewear.api.application.ports.inbound.auth.RefreshTokenUseCase;
 import com.beewear.api.application.ports.inbound.auth.RegisterUseCase;
 import com.beewear.api.application.ports.outbound.persistence.UserRepositoryPort;
 import com.beewear.api.application.ports.outbound.security.PasswordHasherPort;
 import com.beewear.api.application.ports.outbound.security.TokenProviderPort;
+import com.beewear.api.application.ports.outbound.security.TokenValidatorPort;
 import com.beewear.api.application.services.dto.AuthResult;
+import com.beewear.api.application.services.dto.RefreshTokenResult;
 import com.beewear.api.domain.entities.User;
-import com.beewear.api.domain.exceptions.AlphanumericalPasswordException;
-import com.beewear.api.domain.exceptions.ConfirmPasswordMismatchException;
-import com.beewear.api.domain.exceptions.DuplicateEmailException;
-import com.beewear.api.domain.exceptions.InvalidCredentialsException;
+import com.beewear.api.domain.exceptions.*;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
-public class AuthService implements LoginUseCase, RegisterUseCase {
+public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenUseCase {
 
     private final UserRepositoryPort userRepository;
     private final PasswordHasherPort passwordHasher;
     private final TokenProviderPort tokenProvider;
+    private final TokenValidatorPort tokenValidator;
 
     @Override
     public AuthResult login(String email, String rawPassword) {
@@ -66,11 +68,28 @@ public class AuthService implements LoginUseCase, RegisterUseCase {
         return new AuthResult(savedUser, accessToken, refreshToken);
     }
 
-
     private boolean isValidPassword(String password) {
         Pattern ALPHANUMERIC_PATTERN =
                 Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$");
 
         return ALPHANUMERIC_PATTERN.matcher(password).matches();
+    }
+
+    @Override
+    public RefreshTokenResult refreshAccessToken(String refreshToken) {
+        if(!tokenValidator.validateRefreshToken(refreshToken)) {
+            throw new UnauthorizedException();
+        }
+
+        UUID userId = tokenValidator.getRefreshTokenSubject(refreshToken);
+        User user = userRepository.findById(userId);
+
+        String newAccessToken = tokenProvider.createAccessToken(user);
+        String newRefreshToken = tokenProvider.createRefreshToken(user);
+
+        return RefreshTokenResult.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 }

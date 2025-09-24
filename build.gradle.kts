@@ -66,7 +66,12 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
 }
+
+// b33w34rf0rb1nus14n
 
 tasks.withType<Test> {
 	useJUnitPlatform()

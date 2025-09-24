@@ -33,7 +33,8 @@ public class AuthConfiguration {
     @Bean
     public AuthService authService(UserRepositoryPort userRepository,
                                    PasswordHasherPort passwordHasher,
-                                   TokenProviderPort tokenProvider) {
-        return new AuthService(userRepository, passwordHasher, tokenProvider);
+                                   TokenProviderPort tokenProvider,
+                                   TokenValidatorPort tokenValidator) {
+        return new AuthService(userRepository, passwordHasher, tokenProvider, tokenValidator);
     }
 }

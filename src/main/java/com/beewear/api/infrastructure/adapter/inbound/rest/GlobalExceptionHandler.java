@@ -1,10 +1,6 @@
 package com.beewear.api.infrastructure.adapter.inbound.rest;
 
-
-import com.beewear.api.domain.exceptions.AlphanumericalPasswordException;
-import com.beewear.api.domain.exceptions.ConfirmPasswordMismatchException;
-import com.beewear.api.domain.exceptions.DuplicateEmailException;
-import com.beewear.api.domain.exceptions.InvalidCredentialsException;
+import com.beewear.api.domain.exceptions.*;
 import com.beewear.api.infrastructure.adapter.inbound.rest.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +18,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorizedException(UnauthorizedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(401, ex.getMessage()));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
