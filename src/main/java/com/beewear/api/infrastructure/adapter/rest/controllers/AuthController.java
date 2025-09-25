@@ -1,34 +1,31 @@
 package com.beewear.api.infrastructure.adapter.rest.controllers;
 
-import com.beewear.api.application.ports.inbound.auth.LoginUseCase;
-import com.beewear.api.application.ports.inbound.auth.RefreshTokenUseCase;
-import com.beewear.api.application.ports.inbound.auth.RegisterUseCase;
+import com.beewear.api.application.ports.inbound.auth.*;
 import com.beewear.api.application.services.dto.AuthResult;
 import com.beewear.api.application.services.dto.RefreshTokenResult;
 import com.beewear.api.infrastructure.adapter.rest.mapper.RefreshTokenResultMapper;
-import com.beewear.api.infrastructure.adapter.rest.requests.LoginRequest;
-import com.beewear.api.infrastructure.adapter.rest.requests.RefreshTokenRequest;
-import com.beewear.api.infrastructure.adapter.rest.requests.RegisterRequest;
+import com.beewear.api.infrastructure.adapter.rest.requests.*;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
 import com.beewear.api.infrastructure.adapter.rest.responses.RefreshTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Auth API", description = "API for user authentication and registration")
 public class AuthController {
 
+    private final ValidateOtpUseCase validateOtpUseCase;
+    private final CreateOtpUseCase createOtpUseCase;
     private final RegisterUseCase registerUseCase;
     private final LoginUseCase loginUseCase;
     private final RefreshTokenUseCase refreshTokenUseCase;
@@ -69,5 +66,19 @@ public class AuthController {
         RefreshTokenResponse response = refreshTokenResultMapper.toResponse(result);
 
         return ResponseEntity.ok(ApiResponse.success(200, response));
+    }
+
+    @PostMapping("/otp/create")
+    public ResponseEntity<ApiResponse<Void>> createOtp(@Valid @RequestBody CreateOtpRequest req) {
+        createOtpUseCase.createOtp(req.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(null);
+    }
+
+    @PostMapping("/otp/validate")
+    public ResponseEntity<ApiResponse<Void>> validateOtp(@Valid @RequestBody ValidateOtpRequest req) {
+        validateOtpUseCase.validateOtp(req.getEmail(), req.getOtp());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(null);
     }
 }

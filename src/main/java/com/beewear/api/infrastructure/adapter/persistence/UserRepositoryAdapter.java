@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Repository
-public class UserRepository implements UserRepositoryPort {
+public class UserRepositoryAdapter implements UserRepositoryPort {
 
     private UserJpaMapper userJpaMapper;
     private SpringUserRepository repository;

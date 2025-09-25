@@ -24,6 +24,12 @@ public class ApiResponse<T> {
         return response;
     }
 
+    public static <T> ApiResponse<T> statusOnly(int statusCode) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setStatusCode(statusCode);
+        return response;
+    }
+
     public static <T> ApiResponse<T> error(int statusCode, String message) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setStatusCode(statusCode);

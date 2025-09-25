@@ -25,7 +25,7 @@ public class MeController {
     private final MeResultMapper meResultMapper;
 
     @GetMapping
-    private ResponseEntity<ApiResponse<MeResponse>> me(@AuthenticationPrincipal UUID userId) {
+    public ResponseEntity<ApiResponse<MeResponse>> me(@AuthenticationPrincipal UUID userId) {
         MeResponse res = meResultMapper.toResponse(getMeUseCase.getMe(userId));
         return ResponseEntity.ok(ApiResponse.success(200, res));
     }

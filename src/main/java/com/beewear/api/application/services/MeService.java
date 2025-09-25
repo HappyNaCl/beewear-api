@@ -5,9 +5,11 @@ import com.beewear.api.application.ports.outbound.persistence.UserRepositoryPort
 import com.beewear.api.application.services.dto.MeResult;
 import com.beewear.api.domain.entities.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
 public class MeService implements GetMeUseCase {
 

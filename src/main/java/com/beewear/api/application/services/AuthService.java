@@ -12,10 +12,12 @@ import com.beewear.api.application.services.dto.RefreshTokenResult;
 import com.beewear.api.domain.entities.User;
 import com.beewear.api.domain.exceptions.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+@Component
 @RequiredArgsConstructor
 public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenUseCase {
 
