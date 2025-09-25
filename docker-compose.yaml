@@ -1,0 +1,44 @@
+services:
+  postgres:
+    container_name: "beewear-db"
+    image: "postgres:latest"
+    environment:
+      - "POSTGRES_DB=beewear"
+      - "POSTGRES_PASSWORD=b33w3ar"
+      - "POSTGRES_USER=beewear"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - network
+
+  rabbitmq:
+    container_name: "beewear-amqp"
+    image: "rabbitmq:3.13-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "beewear"
+      RABBITMQ_DEFAULT_PASS: "beewear"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - network
+
+  redis:
+    container_name: "beewear-redis"
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    networks:
+      - network
+
+volumes:
+  postgres-data:
+  rabbitmq_data:
+
+networks:
+  network:
+    driver: bridge
