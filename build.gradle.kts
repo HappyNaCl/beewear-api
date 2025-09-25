@@ -51,7 +51,7 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.springframework.session:spring-session-jdbc")
-
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     implementation("org.mapstruct:mapstruct:1.6.2")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.2")
@@ -69,8 +69,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
 }
-
-// b33w34rf0rb1nus14n
 
 tasks.withType<Test> {
 	useJUnitPlatform()

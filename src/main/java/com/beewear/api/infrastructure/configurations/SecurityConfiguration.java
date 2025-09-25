@@ -1,8 +1,8 @@
 package com.beewear.api.infrastructure.configurations;
 
 import com.beewear.api.application.ports.outbound.security.TokenValidatorPort;
-import com.beewear.api.infrastructure.adapter.inbound.rest.filters.JwtAuthenticationEntryPoint;
-import com.beewear.api.infrastructure.adapter.inbound.rest.filters.JwtAuthenticationFilter;
+import com.beewear.api.infrastructure.adapter.rest.filters.JwtAuthenticationEntryPoint;
+import com.beewear.api.infrastructure.adapter.rest.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
