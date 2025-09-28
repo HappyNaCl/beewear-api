@@ -9,15 +9,17 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class User {
+public class Product {
     private UUID id;
-    private String username;
-    private String email;
-    private String password;
-    private String profilePicture;
+    private String name;
+    private String description;
+    private double price;
+    private String imageUrl;
+
+    private UUID creatorId;
 
     private Instant createdAt;
     private Instant updatedAt;

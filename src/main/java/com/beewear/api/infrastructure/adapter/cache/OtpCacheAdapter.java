@@ -23,9 +23,13 @@ public class OtpCacheAdapter implements OtpCachePort {
     }
 
     @Override
-    public boolean validateOtp(String email, String otp) {
-        String cachedOtp = redisTemplate.opsForValue().get(getRedisKey(email));
-        return otp.equals(cachedOtp);
+    public String getOtp(String email) {
+        return redisTemplate.opsForValue().get(getRedisKey(email));
+    }
+
+    @Override
+    public void deactivateOtp(String email) {
+        redisTemplate.delete(getRedisKey(email));
     }
 
     @Override

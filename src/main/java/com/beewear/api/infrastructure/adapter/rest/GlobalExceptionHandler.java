@@ -13,6 +13,35 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    @ExceptionHandler(InvalidOtpSessionException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidOtpSessionException(InvalidOtpSessionException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(OtpSessionExpiredException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidOtpSessionException(OtpSessionExpiredException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidOtpSessionException(OtpExpiredException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(OtpMismatchException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidOtpSessionException(OtpMismatchException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+
     @ExceptionHandler(ConfirmPasswordMismatchException.class)
     public ResponseEntity<ApiResponse<Object>> handlePasswordMismatch(ConfirmPasswordMismatchException ex) {
         return ResponseEntity

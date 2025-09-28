@@ -6,6 +6,7 @@ import com.beewear.api.application.services.dto.RefreshTokenResult;
 import com.beewear.api.infrastructure.adapter.rest.mapper.RefreshTokenResultMapper;
 import com.beewear.api.infrastructure.adapter.rest.requests.*;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
+import com.beewear.api.infrastructure.adapter.rest.responses.OtpSessionResponse;
 import com.beewear.api.infrastructure.adapter.rest.responses.RefreshTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,7 +47,8 @@ public class AuthController {
                 req.getEmail(),
                 req.getUsername(),
                 req.getPassword(),
-                req.getConfirmPassword()
+                req.getConfirmPassword(),
+                req.getOtpSessionId()
         );
         return ResponseEntity.ok(ApiResponse.success(200, res));
     }
@@ -76,9 +78,9 @@ public class AuthController {
     }
 
     @PostMapping("/otp/validate")
-    public ResponseEntity<ApiResponse<Void>> validateOtp(@Valid @RequestBody ValidateOtpRequest req) {
-        validateOtpUseCase.validateOtp(req.getEmail(), req.getOtp());
+    public ResponseEntity<ApiResponse<OtpSessionResponse>> validateOtp(@Valid @RequestBody ValidateOtpRequest req) {
+        String otpSessionId = validateOtpUseCase.validateOtp(req.getEmail(), req.getOtp());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(null);
+                .body(ApiResponse.success(200, new OtpSessionResponse(otpSessionId)));
     }
 }

@@ -27,4 +27,7 @@ public class RegisterRequest {
     @NotBlank(message = "Confirm Password can not be empty")
     private String confirmPassword;
 
+    @NotBlank(message = "OTP session Id is required")
+    private String otpSessionId;
+
 }
