@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,4 +32,6 @@ public class RegisterRequest {
     @NotBlank(message = "OTP is required")
     private String otp;
 
+    @NotBlank(message = "Region is required")
+    private UUID regionId;
 }

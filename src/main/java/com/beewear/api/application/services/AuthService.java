@@ -3,7 +3,7 @@ package com.beewear.api.application.services;
 import com.beewear.api.application.ports.inbound.auth.LoginUseCase;
 import com.beewear.api.application.ports.inbound.auth.RefreshTokenUseCase;
 import com.beewear.api.application.ports.inbound.auth.RegisterUseCase;
-import com.beewear.api.application.ports.outbound.cache.OtpSessionCachePort;
+import com.beewear.api.application.ports.outbound.cache.OtpCachePort;
 import com.beewear.api.application.ports.outbound.persistence.UserRepositoryPort;
 import com.beewear.api.application.ports.outbound.security.PasswordHasherPort;
 import com.beewear.api.application.ports.outbound.security.TokenProviderPort;
@@ -26,7 +26,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
     private final PasswordHasherPort passwordHasher;
     private final TokenProviderPort tokenProvider;
     private final TokenValidatorPort tokenValidator;
-    private final OtpSessionCachePort  otpSessionCachePort;
+    private final OtpCachePort otpCachePort;
 
     @Override
     public AuthResult login(String email, String rawPassword) {
@@ -43,14 +43,14 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
     }
 
     @Override
-    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otpSessionId) {
-        String cachedOtpSession = otpSessionCachePort.getOtpSession(email);
-        if(cachedOtpSession == null) {
-            throw new OtpSessionExpiredException();
+    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otp) {
+        String cachedOtp = otpCachePort.getOtp(email);
+        if(cachedOtp == null) {
+            throw new OtpExpiredException();
         }
 
-        if(!otpSessionId.equals(cachedOtpSession)) {
-            throw new InvalidOtpSessionException();
+        if(!otp.equals(cachedOtp)) {
+            throw new OtpMismatchException();
         }
 
         if(!isValidPassword(rawPassword)) {
@@ -78,7 +78,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
         String accessToken = tokenProvider.createAccessToken(savedUser);
         String refreshToken = tokenProvider.createRefreshToken(savedUser);
 
-        otpSessionCachePort.deactivateOtpSession(email);
+        otpCachePort.deactivateOtp(email);
 
         return new AuthResult(savedUser, accessToken, refreshToken);
     }

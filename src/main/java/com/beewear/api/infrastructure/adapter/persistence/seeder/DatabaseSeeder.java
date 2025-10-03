@@ -3,6 +3,7 @@ package com.beewear.api.infrastructure.adapter.persistence.seeder;
 import com.beewear.api.infrastructure.adapter.persistence.models.RegionJpaModel;
 import com.beewear.api.infrastructure.adapter.persistence.repository.SpringRegionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final SpringRegionRepository regionRepository;
@@ -27,7 +29,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             );
 
             regionRepository.saveAll(regions);
-            System.out.println("Regions seeded!");
+            log.info("Regions seeded!");
         }
     }
 

@@ -33,6 +33,10 @@ public class UserJpaModel {
 
     private @Nullable String profilePicture;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private RegionJpaModel region;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private Instant createdAt;

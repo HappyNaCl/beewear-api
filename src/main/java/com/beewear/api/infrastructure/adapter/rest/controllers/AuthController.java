@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Auth API", description = "API for user authentication and registration")
 public class AuthController {
 
-    private final ValidateOtpUseCase validateOtpUseCase;
     private final CreateOtpUseCase createOtpUseCase;
     private final RegisterUseCase registerUseCase;
     private final LoginUseCase loginUseCase;
@@ -48,7 +47,7 @@ public class AuthController {
                 req.getUsername(),
                 req.getPassword(),
                 req.getConfirmPassword(),
-                req.getOtpSessionId()
+                req.getOtp()
         );
         return ResponseEntity.ok(ApiResponse.success(200, res));
     }
@@ -75,12 +74,5 @@ public class AuthController {
         createOtpUseCase.createOtp(req.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(null);
-    }
-
-    @PostMapping("/otp/validate")
-    public ResponseEntity<ApiResponse<OtpSessionResponse>> validateOtp(@Valid @RequestBody ValidateOtpRequest req) {
-        String otpSessionId = validateOtpUseCase.validateOtp(req.getEmail(), req.getOtp());
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success(200, new OtpSessionResponse(otpSessionId)));
     }
 }
