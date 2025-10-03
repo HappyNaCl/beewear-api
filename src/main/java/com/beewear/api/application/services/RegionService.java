@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RegionService implements GetRegions {
 
-    private RegionRepositoryPort regionRepository;
+    private final RegionRepositoryPort regionRepository;
 
     @Override
     public List<Region> getRegions() {
