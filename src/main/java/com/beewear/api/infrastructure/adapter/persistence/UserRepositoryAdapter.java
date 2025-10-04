@@ -5,19 +5,24 @@ import com.beewear.api.domain.entities.User;
 import com.beewear.api.domain.exceptions.InvalidCredentialsException;
 import com.beewear.api.domain.exceptions.UserNotFoundException;
 import com.beewear.api.infrastructure.adapter.persistence.mapper.UserJpaMapper;
+import com.beewear.api.infrastructure.adapter.persistence.models.RegionJpaModel;
 import com.beewear.api.infrastructure.adapter.persistence.models.UserJpaModel;
+import com.beewear.api.infrastructure.adapter.persistence.repository.SpringRegionRepository;
 import com.beewear.api.infrastructure.adapter.persistence.repository.SpringUserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+@Slf4j
 @AllArgsConstructor
 @Repository
 public class UserRepositoryAdapter implements UserRepositoryPort {
 
     private UserJpaMapper userJpaMapper;
     private SpringUserRepository repository;
+    private SpringRegionRepository regionRepository;
 
     @Override
     public User findByEmail(String email) {
@@ -43,6 +48,14 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public User save(User user) {
         UserJpaModel model = userJpaMapper.toJpaModel(user);
+        log.debug("Saving user with region {}", model.getRegion().getId());
+        if (model.getRegion() != null && model.getRegion().getId() != null) {
+            RegionJpaModel existingRegion = regionRepository
+                    .findById(model.getRegion().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Region not found"));
+            model.setRegion(existingRegion);
+        }
+
         UserJpaModel savedModel = repository.save(model);
         return userJpaMapper.toDomain(savedModel);
     }

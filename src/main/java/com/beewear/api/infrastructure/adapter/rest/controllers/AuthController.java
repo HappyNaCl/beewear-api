@@ -6,7 +6,6 @@ import com.beewear.api.application.services.dto.RefreshTokenResult;
 import com.beewear.api.infrastructure.adapter.rest.mapper.RefreshTokenResultMapper;
 import com.beewear.api.infrastructure.adapter.rest.requests.*;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
-import com.beewear.api.infrastructure.adapter.rest.responses.OtpSessionResponse;
 import com.beewear.api.infrastructure.adapter.rest.responses.RefreshTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,12 +41,19 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "User registration with email, username and password", description = "Gives back user's data and tokens")
     public ResponseEntity<ApiResponse<AuthResult>> register(@Valid @RequestBody RegisterRequest req) {
+        if(req.getGender() == null){
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, "Gender is required"));
+        }
+
         AuthResult res = registerUseCase.register(
                 req.getEmail(),
                 req.getUsername(),
                 req.getPassword(),
                 req.getConfirmPassword(),
-                req.getOtp()
+                req.getOtp(),
+                req.getGender(),
+                req.getRegionId()
         );
         return ResponseEntity.ok(ApiResponse.success(200, res));
     }

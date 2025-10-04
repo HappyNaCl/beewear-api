@@ -1,5 +1,6 @@
 package com.beewear.api.infrastructure.adapter.persistence.models;
 
+import com.beewear.api.domain.entities.enums.Gender;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,9 @@ public class UserJpaModel {
     private @Nullable String password;
 
     private @Nullable String profilePicture;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id")

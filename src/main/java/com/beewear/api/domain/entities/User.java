@@ -1,5 +1,6 @@
 package com.beewear.api.domain.entities;
 
+import com.beewear.api.domain.entities.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +19,9 @@ public class User {
     private String email;
     private String password;
     private String profilePicture;
+    private Gender gender;
 
-    private Region region;
+    private UUID regionId;
 
     private Instant createdAt;
     private Instant updatedAt;

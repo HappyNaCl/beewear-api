@@ -11,6 +11,7 @@ import com.beewear.api.application.ports.outbound.security.TokenValidatorPort;
 import com.beewear.api.application.services.dto.AuthResult;
 import com.beewear.api.application.services.dto.RefreshTokenResult;
 import com.beewear.api.domain.entities.User;
+import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.exceptions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
     }
 
     @Override
-    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otp) {
+    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otp, Gender gender, UUID regionId) {
         String cachedOtp = otpCachePort.getOtp(email);
         if(cachedOtp == null) {
             throw new OtpExpiredException();
@@ -70,7 +71,9 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
         User newUser = User.builder()
                 .email(email)
                 .username(username)
+                .gender(gender)
                 .password(hashedPassword)
+                .regionId(regionId)
                 .build();
 
         User savedUser = userRepository.save(newUser);

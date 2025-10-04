@@ -1,11 +1,12 @@
 package com.beewear.api.infrastructure.adapter.rest.requests;
 
+import com.beewear.api.domain.entities.enums.Gender;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
@@ -29,9 +30,18 @@ public class RegisterRequest {
     @NotBlank(message = "Confirm Password can not be empty")
     private String confirmPassword;
 
+    @Schema(
+            description = "can only be MALE or FEMALE (case sensitive)",
+            example = "MALE"
+    )
+    private Gender gender;
+
     @NotBlank(message = "OTP is required")
     private String otp;
 
-    @NotBlank(message = "Region is required")
+    @Schema(
+            description = "region Id from the regions table"
+    )
     private UUID regionId;
+
 }
