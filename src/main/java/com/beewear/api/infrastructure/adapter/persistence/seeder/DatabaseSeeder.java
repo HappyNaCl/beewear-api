@@ -1,7 +1,7 @@
 package com.beewear.api.infrastructure.adapter.persistence.seeder;
 
 import com.beewear.api.infrastructure.adapter.persistence.models.RegionJpaModel;
-import com.beewear.api.infrastructure.adapter.persistence.repository.SpringRegionRepository;
+import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringRegionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

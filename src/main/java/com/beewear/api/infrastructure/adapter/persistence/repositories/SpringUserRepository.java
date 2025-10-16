@@ -1,4 +1,4 @@
-package com.beewear.api.infrastructure.adapter.persistence.repository;
+package com.beewear.api.infrastructure.adapter.persistence.repositories;
 
 import com.beewear.api.infrastructure.adapter.persistence.models.UserJpaModel;
 import org.springframework.data.jpa.repository.JpaRepository;

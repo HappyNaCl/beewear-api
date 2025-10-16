@@ -1,5 +1,8 @@
 package com.beewear.api.infrastructure.adapter.persistence.models;
 
+import com.beewear.api.domain.entities.enums.Gender;
+import com.beewear.api.domain.entities.enums.ProductCategory;
+import com.beewear.api.domain.entities.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +12,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,14 +34,31 @@ public class ProductJpaModel {
     private String description;
 
     @Column(nullable = false)
-    private String imageUrl;
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status = ProductStatus.ACTIVE;
 
     @Column(nullable = false)
     private Double price;
 
-    @ManyToOne
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender forGender = Gender.UNSPECIFIED;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductCategory productCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
     private UserJpaModel creator;
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<ProductImageJpaModel> productImages = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)

@@ -2,9 +2,9 @@ package com.beewear.api.infrastructure.adapter.persistence;
 
 import com.beewear.api.application.ports.outbound.persistence.RegionRepositoryPort;
 import com.beewear.api.domain.entities.Region;
-import com.beewear.api.infrastructure.adapter.persistence.mapper.RegionJpaMapper;
+import com.beewear.api.infrastructure.adapter.persistence.mappers.RegionJpaMapper;
 import com.beewear.api.infrastructure.adapter.persistence.models.RegionJpaModel;
-import com.beewear.api.infrastructure.adapter.persistence.repository.SpringRegionRepository;
+import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringRegionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 

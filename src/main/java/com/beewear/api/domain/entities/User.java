@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -22,6 +23,9 @@ public class User {
     private Gender gender;
 
     private UUID regionId;
+
+    private Region region;
+    private List<Product> products;
 
     private Instant createdAt;
     private Instant updatedAt;
