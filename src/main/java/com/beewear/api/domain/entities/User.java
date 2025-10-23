@@ -24,6 +24,7 @@ public class User {
 
     private UUID regionId;
 
+    private List<Subscription> subscriptions;
     private Region region;
     private List<Product> products;
 

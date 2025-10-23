@@ -51,7 +51,7 @@ public class ProductService implements CreateProductUseCase {
         List<UploadedImage> uploadedImages = new ArrayList<>();
 
         for (ProductImageFile image : images) {
-            UploadedImage uploadedImage = imageUploader.uploadImage(image.fileName(), image.data());
+            UploadedImage uploadedImage = imageUploader.uploadImage(image.fileName(), image.data(), String.format("products/%s", savedProduct.getId()));
             uploadedImages.add(uploadedImage);
         }
 

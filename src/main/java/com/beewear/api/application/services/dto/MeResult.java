@@ -12,4 +12,5 @@ public class MeResult {
     private final String email;
     private final String username;
     private final String profilePicture;
+    private final String subscriptionPlanName;
 }

@@ -1,6 +1,7 @@
 package com.beewear.api.infrastructure.adapter.persistence.models;
 
 import com.beewear.api.domain.entities.enums.Gender;
+import com.beewear.api.domain.entities.enums.SubscriptionStatus;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -50,6 +52,14 @@ public class UserJpaModel {
             fetch = FetchType.LAZY
     )
     private List<ProductJpaModel> products = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<SubscriptionJpaModel> subscriptions = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)

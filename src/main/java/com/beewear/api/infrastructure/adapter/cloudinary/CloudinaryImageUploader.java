@@ -17,6 +17,33 @@ public class CloudinaryImageUploader implements ImageUploaderPort {
     }
 
     @Override
+    public UploadedImage uploadImage(String fileName, byte[] data, String folder) {
+        log.info("Uploading {} to Cloudinary", fileName);
+        try {
+            String publicId = fileName.contains(".")
+                    ? fileName.substring(0, fileName.lastIndexOf('.'))
+                    : fileName;
+
+            var uploadResult = cloudinary.uploader().upload(data,
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "overwrite", true,
+                            "resource_type", "image",
+                            "folder", folder
+                    )
+            );
+
+            return new UploadedImage(
+                    (String) uploadResult.get("secure_url"),
+                    (String) uploadResult.get("public_id")
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload image to Cloudinary", e);
+        }
+    }
+
+    @Override
     public UploadedImage uploadImage(String fileName, byte[] data) {
         log.info("Uploading {} to Cloudinary", fileName);
         try {
