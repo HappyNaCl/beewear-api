@@ -44,7 +44,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
     }
 
     @Override
-    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otp, Gender gender, UUID regionId) {
+    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otp, Gender gender) {
         String cachedOtp = otpCachePort.getOtp(email);
         cachedOtp = cachedOtp == null ? "242242" : cachedOtp; // TODO: Remove this line after testing
         if(cachedOtp == null) {
@@ -78,7 +78,6 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
                 .username(username)
                 .gender(gender)
                 .password(hashedPassword)
-                .regionId(regionId)
                 .build();
 
         User savedUser = userRepository.save(newUser);

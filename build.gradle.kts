@@ -67,6 +67,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
 
     implementation("org.springframework.boot:spring-boot-starter-mail")
+
+    implementation("net.datafaker:datafaker:2.5.2")
 }
 
 tasks.withType<Test> {

@@ -38,10 +38,4 @@ public class RegisterRequest {
 
     @NotBlank(message = "OTP is required")
     private String otp;
-
-    @Schema(
-            description = "region Id from the regions table"
-    )
-    private UUID regionId;
-
 }

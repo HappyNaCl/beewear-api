@@ -52,8 +52,7 @@ public class AuthController {
                 req.getPassword(),
                 req.getConfirmPassword(),
                 req.getOtp(),
-                req.getGender(),
-                req.getRegionId()
+                req.getGender()
         );
         return ResponseEntity.ok(ApiResponse.success(200, res));
     }

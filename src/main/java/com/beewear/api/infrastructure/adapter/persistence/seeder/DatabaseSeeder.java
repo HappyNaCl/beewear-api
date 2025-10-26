@@ -1,8 +1,6 @@
 package com.beewear.api.infrastructure.adapter.persistence.seeder;
 
-import com.beewear.api.infrastructure.adapter.persistence.models.RegionJpaModel;
 import com.beewear.api.infrastructure.adapter.persistence.models.SubscriptionPlanJpaModel;
-import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringRegionRepository;
 import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringSubscriptionPlanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,24 +15,6 @@ import java.util.List;
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final SpringSubscriptionPlanRepository subscriptionPlanRepository;
-    private final SpringRegionRepository regionRepository;
-
-    private void seedRegion() {
-        if (regionRepository.count() == 0) {
-            List<RegionJpaModel> regions = List.of(
-                    new RegionJpaModel(null, "BINUS Kemanggisan"),
-                    new RegionJpaModel(null, "BINUS Alam Sutera"),
-                    new RegionJpaModel(null, "BINUS Bekasi"),
-                    new RegionJpaModel(null, "BINUS Bandung"),
-                    new RegionJpaModel(null, "BINUS Semarang"),
-                    new RegionJpaModel(null, "BINUS Malang"),
-                    new RegionJpaModel(null, "BINUS Medan")
-            );
-
-            regionRepository.saveAll(regions);
-            log.info("Regions seeded!");
-        }
-    }
 
     private void seedSubscriptionPlan() {
         if(subscriptionPlanRepository.count() == 0) {
@@ -62,7 +42,6 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        seedRegion();
         seedSubscriptionPlan();
     }
 }

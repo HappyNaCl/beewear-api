@@ -22,10 +22,7 @@ public class User {
     private String profilePicture;
     private Gender gender;
 
-    private UUID regionId;
-
     private List<Subscription> subscriptions;
-    private Region region;
     private List<Product> products;
 
     private Instant createdAt;

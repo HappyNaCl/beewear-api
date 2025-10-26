@@ -8,14 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserJpaMapper {
 
-    @Mapping(target = "region" , ignore = true)
     @Mapping(target = "products", ignore = true)
-    @Mapping(target = "regionId", source = "region.id")
     User toDomain(UserJpaModel model);
 
-    @Mapping(target = "region" , ignore = true)
     @Mapping(target = "products", ignore = true)
-    @Mapping(target = "region.id", source = "regionId")
     UserJpaModel toJpaModel(User user);
 
 }

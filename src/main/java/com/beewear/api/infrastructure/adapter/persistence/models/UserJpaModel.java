@@ -41,10 +41,6 @@ public class UserJpaModel {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id")
-    private RegionJpaModel region;
-
     @OneToMany(
             mappedBy = "creator",
             cascade = CascadeType.ALL,

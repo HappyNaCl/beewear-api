@@ -1,6 +1,7 @@
 package com.beewear.api.application.services;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
+import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
 import com.beewear.api.application.ports.outbound.persistence.ProductRepositoryPort;
 import com.beewear.api.application.ports.outbound.s3.ImageUploaderPort;
 import com.beewear.api.domain.entities.Product;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class ProductService implements CreateProductUseCase {
     private final ImageUploaderPort imageUploader;
     private final ProductRepositoryPort productRepository;
+    private final ProductDocumentPort productDocumentPort;
 
     @Transactional
     @Override
@@ -55,6 +57,9 @@ public class ProductService implements CreateProductUseCase {
             uploadedImages.add(uploadedImage);
         }
 
-        return productRepository.updateImageUrls(savedProduct, uploadedImages);
+        Product productWithImage = productRepository.updateImageUrls(savedProduct, uploadedImages);
+        productDocumentPort.addProduct(productWithImage);
+
+        return productWithImage;
     }
 }
