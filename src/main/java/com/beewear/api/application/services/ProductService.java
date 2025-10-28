@@ -1,6 +1,9 @@
 package com.beewear.api.application.services;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
+import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
+import com.beewear.api.application.ports.outbound.cache.ProductCachePort;
+import com.beewear.api.application.ports.outbound.cache.RecentProductsCachePort;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
 import com.beewear.api.application.ports.outbound.persistence.ProductRepositoryPort;
 import com.beewear.api.application.ports.outbound.s3.ImageUploaderPort;
@@ -14,16 +17,17 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class ProductService implements CreateProductUseCase {
+public class ProductService implements CreateProductUseCase, GetRecentProductsUseCase {
     private final ImageUploaderPort imageUploader;
     private final ProductRepositoryPort productRepository;
     private final ProductDocumentPort productDocumentPort;
+    private final ProductCachePort productCachePort;
+    private final RecentProductsCachePort recentProductsCachePort;
 
     @Transactional
     @Override
@@ -60,6 +64,69 @@ public class ProductService implements CreateProductUseCase {
         Product productWithImage = productRepository.updateImageUrls(savedProduct, uploadedImages);
         productDocumentPort.addProduct(productWithImage);
 
+        productCachePort.addProduct(productWithImage);
+        recentProductsCachePort.addProduct(productWithImage.getId().toString(),
+                productWithImage.getCreatedAt().getEpochSecond());
+
         return productWithImage;
+    }
+
+    @Override
+    public List<Product> getRecentProducts(int limit) {
+        Set<String> productIds = recentProductsCachePort.getRecentProducts(limit);
+
+        Set<UUID> uuidProductIds = new LinkedHashSet<>();
+        for (String id : productIds) {
+            uuidProductIds.add(UUID.fromString(id));
+        }
+
+        return resolveProductIds(limit, uuidProductIds, null);
+    }
+
+    @Override
+    public List<Product> getRecentProducts(int limit, Instant lastTimestamp) {
+        Set<String> productIds = recentProductsCachePort.getRecentProducts(limit, lastTimestamp.getEpochSecond());
+
+        Set<UUID> uuidProductIds = new LinkedHashSet<>();
+        for (String id : productIds) {
+            uuidProductIds.add(UUID.fromString(id));
+        }
+
+        return resolveProductIds(limit, uuidProductIds, lastTimestamp);
+    }
+
+    private List<Product> resolveProductIds(int limit, Set<UUID> productIds, Instant lastTimestamp) {
+        if(productIds.isEmpty()) {
+            if(lastTimestamp == null) {
+                productIds = productRepository.getRecentProductIds(limit);
+            }
+            else {
+                productIds = productRepository.getRecentProductIds(limit, lastTimestamp);
+            }
+
+            if (productIds.isEmpty()) {
+                return List.of();
+            }
+        }
+
+        Map<UUID, Product> productsMap = productCachePort.getProducts(productIds);
+
+        List<Product> products = new ArrayList<>();
+        for (UUID id : productIds) {
+            Product p = productsMap.get(id);
+
+            if (p == null) {
+                p = productRepository.findById(id);
+                if (p != null) {
+                    productCachePort.addProduct(p);
+                }
+            }
+
+            if (p != null) {
+                products.add(p);
+            }
+        }
+
+        return products;
     }
 }

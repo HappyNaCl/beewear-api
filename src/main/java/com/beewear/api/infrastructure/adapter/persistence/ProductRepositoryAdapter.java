@@ -9,10 +9,11 @@ import com.beewear.api.infrastructure.adapter.persistence.models.ProductJpaModel
 import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringProductRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
 @Slf4j
 @AllArgsConstructor
@@ -46,5 +47,23 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
 
         ProductJpaModel savedModel = productRepository.save(productJpaModel);
         return productJpaMapper.toDomain(savedModel);
+    }
+
+    @Override
+    public Set<UUID> getRecentProductIds(int limit) {
+        List<UUID> recentIds = productRepository.findRecentProductIds(PageRequest.of(0, limit));
+        return new LinkedHashSet<>(recentIds);
+    }
+
+    @Override
+    public Set<UUID> getRecentProductIds(int limit, Instant lastTimestamp) {
+        List<UUID> recentIds = productRepository.findRecentProductIdsBefore(lastTimestamp, PageRequest.of(0, limit));
+        return new LinkedHashSet<>(recentIds);
+    }
+
+    @Override
+    public Product findById(UUID id) {
+        ProductJpaModel jpaModel =  productRepository.findById(id).orElse(null);
+        return productJpaMapper.toDomain(jpaModel);
     }
 }

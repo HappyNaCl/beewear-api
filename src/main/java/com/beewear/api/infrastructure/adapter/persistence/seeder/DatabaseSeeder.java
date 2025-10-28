@@ -5,6 +5,7 @@ import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringSub
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Profile("seeder")
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final SpringSubscriptionPlanRepository subscriptionPlanRepository;

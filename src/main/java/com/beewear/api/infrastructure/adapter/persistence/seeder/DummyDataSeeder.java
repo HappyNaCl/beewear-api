@@ -27,9 +27,8 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Profile("dev")
+@Profile("seeder")
 public class DummyDataSeeder implements CommandLineRunner {
-
     private final SpringUserRepository userRepository;
     private final SpringProductRepository productRepository;
     private final ElasticsearchProductRepository productElasticsearchRepository;
