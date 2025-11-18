@@ -2,6 +2,7 @@ package com.beewear.api.infrastructure.adapter.rest.controllers;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
+import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.valueobject.ProductImageFile;
 import com.beewear.api.infrastructure.adapter.rest.requests.CreateProductRequest;
@@ -31,11 +32,11 @@ public class ProductController {
     private final GetRecentProductsUseCase getRecentProductsUseCase;
 
     @GetMapping("/recent")
-    public ResponseEntity<ApiResponse<List<Product>>> getRecentProducts(
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getRecentProducts(
             @RequestParam(name = "limit", defaultValue = "10") int limit,
             @RequestParam(name = "lastTimestamp", required = false) Instant lastTimestamp
     ) {
-        List<Product> products;
+        List<ProductDto> products;
 
         if (lastTimestamp != null) {
             log.debug("Getting recent products for last timestamp {}", lastTimestamp);
@@ -48,7 +49,7 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Product>> createProduct(
+    public ResponseEntity<ApiResponse<ProductDto>> createProduct(
             @ModelAttribute CreateProductRequest req,
             @RequestPart("images") List<MultipartFile> images,
             @AuthenticationPrincipal UUID userId
@@ -65,7 +66,7 @@ public class ProductController {
             }
         }).toList();
 
-        createProductUseCase.createProduct(
+        ProductDto dto = createProductUseCase.createProduct(
                 req.getName(),
                 req.getDescription(),
                 req.getPrice(),
@@ -75,7 +76,7 @@ public class ProductController {
                 imageFiles
         );
 
-        return ResponseEntity.ok(ApiResponse.success(201, null));
+        return ResponseEntity.ok(ApiResponse.success(201, dto));
     }
 
 }

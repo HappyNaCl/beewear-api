@@ -7,6 +7,7 @@ import com.beewear.api.application.ports.outbound.cache.RecentProductsCachePort;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
 import com.beewear.api.application.ports.outbound.persistence.ProductRepositoryPort;
 import com.beewear.api.application.ports.outbound.s3.ImageUploaderPort;
+import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
@@ -31,13 +32,13 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
 
     @Transactional
     @Override
-    public Product createProduct(String name,
-                              String description,
-                              double price,
-                              Gender forGender,
-                              ProductCategory productCategory,
-                              UUID creatorId,
-                              List<ProductImageFile> images) {
+    public ProductDto createProduct(String name,
+                                    String description,
+                                    double price,
+                                    Gender forGender,
+                                    ProductCategory productCategory,
+                                    UUID creatorId,
+                                    List<ProductImageFile> images) {
 
         if(images.isEmpty()) {
             throw new NoImageException();
@@ -66,13 +67,13 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
 
         productCachePort.addProduct(productWithImage);
         recentProductsCachePort.addProduct(productWithImage.getId().toString(),
-                productWithImage.getCreatedAt().getEpochSecond());
+                Instant.now().getEpochSecond());
 
-        return productWithImage;
+        return ProductDto.fromProduct(productWithImage);
     }
 
     @Override
-    public List<Product> getRecentProducts(int limit) {
+    public List<ProductDto> getRecentProducts(int limit) {
         Set<String> productIds = recentProductsCachePort.getRecentProducts(limit);
 
         Set<UUID> uuidProductIds = new LinkedHashSet<>();
@@ -84,7 +85,7 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
     }
 
     @Override
-    public List<Product> getRecentProducts(int limit, Instant lastTimestamp) {
+    public List<ProductDto> getRecentProducts(int limit, Instant lastTimestamp) {
         Set<String> productIds = recentProductsCachePort.getRecentProducts(limit, lastTimestamp.getEpochSecond());
 
         Set<UUID> uuidProductIds = new LinkedHashSet<>();
@@ -95,7 +96,7 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
         return resolveProductIds(limit, uuidProductIds, lastTimestamp);
     }
 
-    private List<Product> resolveProductIds(int limit, Set<UUID> productIds, Instant lastTimestamp) {
+    private List<ProductDto> resolveProductIds(int limit, Set<UUID> productIds, Instant lastTimestamp) {
         if(productIds.isEmpty()) {
             if(lastTimestamp == null) {
                 productIds = productRepository.getRecentProductIds(limit);
@@ -127,6 +128,11 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
             }
         }
 
-        return products;
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            productDtos.add(ProductDto.fromProduct(product));
+        }
+
+        return productDtos;
     }
 }
