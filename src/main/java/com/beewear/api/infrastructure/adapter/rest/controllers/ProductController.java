@@ -2,14 +2,18 @@ package com.beewear.api.infrastructure.adapter.rest.controllers;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
+import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
 import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
+import com.beewear.api.domain.entities.enums.Gender;
+import com.beewear.api.domain.entities.enums.ProductCategory;
 import com.beewear.api.domain.valueobject.ProductImageFile;
 import com.beewear.api.infrastructure.adapter.rest.requests.CreateProductRequest;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +34,7 @@ import java.util.UUID;
 public class ProductController {
     private final CreateProductUseCase createProductUseCase;
     private final GetRecentProductsUseCase getRecentProductsUseCase;
+    private final SearchProductUseCase searchProductUseCase;
 
     @GetMapping("/recent")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getRecentProducts(
@@ -44,6 +49,29 @@ public class ProductController {
         } else {
             products = getRecentProductsUseCase.getRecentProducts(limit);
         }
+
+        return ResponseEntity.ok(ApiResponse.success(200, products));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<ProductDto>>> searchProducts(
+            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "minPrice", required = false) Double minPrice,
+            @RequestParam(name = "maxPrice", required = false) Double maxPrice,
+            @RequestParam(name = "gender", required = false) String genderStr,
+            @RequestParam(name = "category", required = false) String categoryStr,
+            Pageable pageable
+    ) {
+        Gender gender = genderStr == null ? null : Gender.valueOf(genderStr);
+        ProductCategory category = categoryStr == null ? null : ProductCategory.valueOf(categoryStr);
+
+        List<ProductDto> products = searchProductUseCase.searchProducts(
+                query,
+                minPrice,
+                maxPrice,
+                gender,
+                category,
+                pageable);
 
         return ResponseEntity.ok(ApiResponse.success(200, products));
     }

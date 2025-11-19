@@ -2,6 +2,7 @@ package com.beewear.api.application.services;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
+import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
 import com.beewear.api.application.ports.outbound.cache.ProductCachePort;
 import com.beewear.api.application.ports.outbound.cache.RecentProductsCachePort;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
@@ -16,6 +17,7 @@ import com.beewear.api.domain.valueobject.ProductImageFile;
 import com.beewear.api.domain.valueobject.UploadedImage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -23,7 +25,8 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class ProductService implements CreateProductUseCase, GetRecentProductsUseCase {
+public class ProductService implements CreateProductUseCase,
+        GetRecentProductsUseCase, SearchProductUseCase {
     private final ImageUploaderPort imageUploader;
     private final ProductRepositoryPort productRepository;
     private final ProductDocumentPort productDocumentPort;
@@ -133,6 +136,16 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
             productDtos.add(ProductDto.fromProduct(product));
         }
 
+        return productDtos;
+    }
+
+    @Override
+    public List<ProductDto> searchProducts(String query, Double minPrice, Double maxPrice, Gender gender, ProductCategory category, Pageable pageable) {
+        List<Product> products = productDocumentPort.searchProducts(query, minPrice, maxPrice, gender, category, pageable);
+        List <ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            productDtos.add(ProductDto.fromProduct(product));
+        }
         return productDtos;
     }
 }
