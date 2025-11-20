@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CloudinaryImageUploader implements ImageUploaderPort {
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
 
     public CloudinaryImageUploader(CloudinaryProperties properties) {
         this.cloudinary = new Cloudinary(properties.getCloudinaryUrl());
@@ -18,7 +18,6 @@ public class CloudinaryImageUploader implements ImageUploaderPort {
 
     @Override
     public UploadedImage uploadImage(String fileName, byte[] data, String folder) {
-        log.info("Uploading {} to Cloudinary", fileName);
         try {
             String publicId = fileName.contains(".")
                     ? fileName.substring(0, fileName.lastIndexOf('.'))

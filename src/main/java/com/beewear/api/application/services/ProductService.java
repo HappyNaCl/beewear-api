@@ -7,12 +7,15 @@ import com.beewear.api.application.ports.outbound.cache.ProductCachePort;
 import com.beewear.api.application.ports.outbound.cache.RecentProductsCachePort;
 import com.beewear.api.application.ports.outbound.cache.SearchProductCachePort;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
+import com.beewear.api.application.ports.outbound.events.ProductEventPublisherPort;
 import com.beewear.api.application.ports.outbound.persistence.ProductRepositoryPort;
 import com.beewear.api.application.ports.outbound.s3.ImageUploaderPort;
+import com.beewear.api.application.services.dto.CreatedProductDto;
 import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
+import com.beewear.api.domain.events.ProductCreatedEvent;
 import com.beewear.api.domain.exceptions.InvalidProductPriceException;
 import com.beewear.api.domain.exceptions.NoImageException;
 import com.beewear.api.domain.valueobject.ProductImageFile;
@@ -36,16 +39,14 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
     private final ProductCachePort productCachePort;
     private final SearchProductCachePort searchProductCachePort;
     private final RecentProductsCachePort recentProductsCachePort;
+    private final ProductEventPublisherPort productEventPublisher;
 
     @Transactional
     @Override
-    public ProductDto createProduct(String name,
-                                    String description,
-                                    Double price,
-                                    Gender forGender,
-                                    ProductCategory productCategory,
-                                    UUID creatorId,
-                                    List<ProductImageFile> images) {
+    public CreatedProductDto createProduct(String name, String description,
+                                           Double price, Gender forGender,
+                                           ProductCategory productCategory,
+                                           UUID creatorId, List<ProductImageFile> images) {
 
         if(images.isEmpty()) {
             throw new NoImageException();
@@ -76,11 +77,9 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
         Product productWithImage = productRepository.updateImageUrls(savedProduct, uploadedImages);
         productDocumentPort.addProduct(productWithImage);
 
-        productCachePort.addProduct(productWithImage);
-        recentProductsCachePort.addProduct(productWithImage.getId().toString(),
-                Instant.now().getEpochSecond());
+        productEventPublisher.publish(new ProductCreatedEvent(productWithImage.getId()));
 
-        return ProductDto.fromProduct(productWithImage);
+        return CreatedProductDto.fromProduct(productWithImage);
     }
 
     @Override

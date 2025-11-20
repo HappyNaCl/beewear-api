@@ -17,12 +17,14 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SearchProductCacheAdapter implements SearchProductCachePort {
 
-    private final String CACHE_KEY = "search_products";
     private final RedisTemplate<String, String> redisTemplate;
 
     private String buildKey(String query, Double minPrice, Double maxPrice,
                             Gender gender, ProductCategory category,
                             Integer size, Integer page) {
+
+        String CACHE_KEY = "search_products";
+
         return CACHE_KEY + ":" +
                 (query != null ? "query:" + normalizeQuery(query) : "") + ":" +
                 (minPrice != null ? "minPrice:" + minPrice : "null") + ":" +

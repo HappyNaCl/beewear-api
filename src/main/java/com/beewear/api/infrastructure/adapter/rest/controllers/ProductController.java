@@ -3,6 +3,7 @@ package com.beewear.api.infrastructure.adapter.rest.controllers;
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
 import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
+import com.beewear.api.application.services.dto.CreatedProductDto;
 import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
@@ -76,7 +77,7 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<ProductDto>> createProduct(
+    public ResponseEntity<ApiResponse<CreatedProductDto>> createProduct(
             @ModelAttribute CreateProductRequest req,
             @RequestPart("images") List<MultipartFile> images,
             @AuthenticationPrincipal UUID userId
@@ -92,7 +93,7 @@ public class ProductController {
             }
         }).toList();
 
-        ProductDto dto = createProductUseCase.createProduct(
+        CreatedProductDto dto = createProductUseCase.createProduct(
                 req.getName(),
                 req.getDescription(),
                 req.getPrice(),
@@ -104,5 +105,9 @@ public class ProductController {
 
         return ResponseEntity.ok(ApiResponse.success(201, dto));
     }
-
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity<ApiResponse<ProductDto>> getProduct(@PathVariable UUID id) {
+//
+//    }
 }
