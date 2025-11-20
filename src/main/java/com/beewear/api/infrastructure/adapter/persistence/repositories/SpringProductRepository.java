@@ -11,10 +11,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface SpringProductRepository extends JpaRepository<ProductJpaModel, UUID> {
-    @Query("SELECT p.id FROM ProductJpaModel p ORDER BY p.createdAt DESC")
-    List<UUID> findRecentProductIds(Pageable pageable);
+    @Query("SELECT p FROM ProductJpaModel p ORDER BY p.createdAt DESC")
+    List<ProductJpaModel> findRecentProducts(Pageable pageable);
 
-    @Query("SELECT p.id FROM ProductJpaModel p WHERE p.createdAt < :lastTimestamp ORDER BY p.createdAt DESC")
-    List<UUID> findRecentProductIdsBefore(@Param("lastTimestamp") Instant lastTimestamp, Pageable pageable);
-
+    @Query("SELECT p FROM ProductJpaModel p WHERE p.createdAt < :lastTimestamp ORDER BY p.createdAt DESC")
+    List<ProductJpaModel> findRecentProductsBefore(@Param("lastTimestamp") Instant lastTimestamp, Pageable pageable);
 }

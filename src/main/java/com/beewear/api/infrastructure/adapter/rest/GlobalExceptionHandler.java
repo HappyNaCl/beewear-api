@@ -95,18 +95,34 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(400, errorMessage));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
-        log.error(ex.getMessage());
-        return ResponseEntity
-                .internalServerError()
-                .body(ApiResponse.error(500, "An unexpected error occurred: " + ex.getMessage()));
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<Object>> handleHttpMessageNotReadableException(){
         return ResponseEntity
                 .badRequest()
                 .body(ApiResponse.error(400, "Bad request"));
     }
+
+    @ExceptionHandler(InvalidProductPriceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidProductPriceException(InvalidProductPriceException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidProductCategoryException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidProductCategoryException(InvalidProductCategoryException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
+        log.error(ex.getMessage());
+        ex.printStackTrace();
+        return ResponseEntity
+                .internalServerError()
+                .body(ApiResponse.error(500, "An unexpected error occurred: " + ex.getMessage()));
+    }
+
 }

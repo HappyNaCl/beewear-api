@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateOtpRequest {
-
     @NotBlank(message = "Email can not be empty")
     @Email(message = "Please use a valid email")
     private String email;

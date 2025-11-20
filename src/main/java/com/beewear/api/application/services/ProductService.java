@@ -5,6 +5,7 @@ import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCas
 import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
 import com.beewear.api.application.ports.outbound.cache.ProductCachePort;
 import com.beewear.api.application.ports.outbound.cache.RecentProductsCachePort;
+import com.beewear.api.application.ports.outbound.cache.SearchProductCachePort;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
 import com.beewear.api.application.ports.outbound.persistence.ProductRepositoryPort;
 import com.beewear.api.application.ports.outbound.s3.ImageUploaderPort;
@@ -12,32 +13,35 @@ import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
+import com.beewear.api.domain.exceptions.InvalidProductPriceException;
 import com.beewear.api.domain.exceptions.NoImageException;
 import com.beewear.api.domain.valueobject.ProductImageFile;
 import com.beewear.api.domain.valueobject.UploadedImage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class ProductService implements CreateProductUseCase,
-        GetRecentProductsUseCase, SearchProductUseCase {
+public class ProductService implements CreateProductUseCase, GetRecentProductsUseCase, SearchProductUseCase {
     private final ImageUploaderPort imageUploader;
     private final ProductRepositoryPort productRepository;
     private final ProductDocumentPort productDocumentPort;
     private final ProductCachePort productCachePort;
+    private final SearchProductCachePort searchProductCachePort;
     private final RecentProductsCachePort recentProductsCachePort;
 
     @Transactional
     @Override
     public ProductDto createProduct(String name,
                                     String description,
-                                    double price,
+                                    Double price,
                                     Gender forGender,
                                     ProductCategory productCategory,
                                     UUID creatorId,
@@ -45,6 +49,10 @@ public class ProductService implements CreateProductUseCase,
 
         if(images.isEmpty()) {
             throw new NoImageException();
+        }
+
+        if(price < 0 || price > 999999999) {
+            throw new InvalidProductPriceException();
         }
 
         Product product = Product.builder()
@@ -84,7 +92,7 @@ public class ProductService implements CreateProductUseCase,
             uuidProductIds.add(UUID.fromString(id));
         }
 
-        return resolveProductIds(limit, uuidProductIds, null);
+        return resolveRecentProductIds(limit, uuidProductIds, null);
     }
 
     @Override
@@ -96,23 +104,37 @@ public class ProductService implements CreateProductUseCase,
             uuidProductIds.add(UUID.fromString(id));
         }
 
-        return resolveProductIds(limit, uuidProductIds, lastTimestamp);
+        return resolveRecentProductIds(limit, uuidProductIds, lastTimestamp);
     }
 
-    private List<ProductDto> resolveProductIds(int limit, Set<UUID> productIds, Instant lastTimestamp) {
-        if(productIds.isEmpty()) {
-            if(lastTimestamp == null) {
-                productIds = productRepository.getRecentProductIds(limit);
-            }
-            else {
-                productIds = productRepository.getRecentProductIds(limit, lastTimestamp);
-            }
+    @Override
+    public List<ProductDto> searchProducts(String query, Double minPrice, Double maxPrice, Gender gender, ProductCategory category, Pageable pageable) {
+        List<UUID> cachedProductIds = searchProductCachePort.getProducts(query, minPrice, maxPrice, gender,
+                category, pageable.getPageSize(), pageable.getPageNumber());
 
-            if (productIds.isEmpty()) {
-                return List.of();
-            }
+        if(!cachedProductIds.isEmpty()) {
+            Set<UUID> productIds = new LinkedHashSet<>(cachedProductIds);
+            return getProducts(productIds);
+         }
+
+        List<Product> products = productDocumentPort.searchProducts(query, minPrice, maxPrice, gender, category, pageable);
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            productDtos.add(ProductDto.fromProduct(product));
         }
 
+        List<UUID> productIdList = new ArrayList<>();
+        for (ProductDto dto : productDtos) {
+            productIdList.add(dto.getId());
+        }
+
+        searchProductCachePort.setProducts(query, minPrice, maxPrice, gender,
+                category, pageable.getPageSize(), pageable.getPageNumber(), productIdList);
+
+        return productDtos;
+    }
+
+    private List<ProductDto> getProducts(Set<UUID> productIds) {
         Map<UUID, Product> productsMap = productCachePort.getProducts(productIds);
 
         List<Product> products = new ArrayList<>();
@@ -139,13 +161,29 @@ public class ProductService implements CreateProductUseCase,
         return productDtos;
     }
 
-    @Override
-    public List<ProductDto> searchProducts(String query, Double minPrice, Double maxPrice, Gender gender, ProductCategory category, Pageable pageable) {
-        List<Product> products = productDocumentPort.searchProducts(query, minPrice, maxPrice, gender, category, pageable);
-        List <ProductDto> productDtos = new ArrayList<>();
-        for (Product product : products) {
-            productDtos.add(ProductDto.fromProduct(product));
+    private List<ProductDto> resolveRecentProductIds(int limit, Set<UUID> productIds, Instant lastTimestamp) {
+        if(productIds.isEmpty()) {
+            List<Product> products;
+            if(lastTimestamp == null) {
+                products = productRepository.getRecentProducts(limit);
+            }
+            else {
+                products = productRepository.getRecentProducts(limit, lastTimestamp);
+            }
+
+            if (products.isEmpty()) {
+                log.debug("No recent products found in database");
+                return List.of();
+            }
+
+            for(Product product : products) {
+                recentProductsCachePort.addProduct(product.getId().toString(),
+                        product.getCreatedAt().getEpochSecond());
+            }
+
+            return products.stream().map(ProductDto::fromProduct).toList();
         }
-        return productDtos;
+
+        return getProducts(productIds);
     }
 }

@@ -7,6 +7,7 @@ import com.beewear.api.domain.entities.enums.ProductCategory;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class ProductDto {
     private Gender forGender;
     private ProductCategory category;
     private List<String> imageUrls;
+    private Instant createdAt;
 
     public static ProductDto fromProduct(Product product) {
         ProductDto dto = new ProductDto();
@@ -32,6 +34,7 @@ public class ProductDto {
                 .map(ProductImage::getImageUrl)
                 .toList();
 
+        dto.createdAt = product.getCreatedAt();
         return dto;
     }
 }

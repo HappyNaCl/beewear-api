@@ -13,7 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @AllArgsConstructor
@@ -50,15 +52,25 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
-    public Set<UUID> getRecentProductIds(int limit) {
-        List<UUID> recentIds = productRepository.findRecentProductIds(PageRequest.of(0, limit));
-        return new LinkedHashSet<>(recentIds);
+    public List<Product> getRecentProducts(int limit) {
+        List<ProductJpaModel> recentProducts = productRepository.findRecentProducts(PageRequest.of(0, limit));
+        List<Product> products = new ArrayList<>();
+        for (ProductJpaModel jpaModel : recentProducts) {
+            products.add(productJpaMapper.toDomain(jpaModel));
+        }
+
+        return products;
     }
 
     @Override
-    public Set<UUID> getRecentProductIds(int limit, Instant lastTimestamp) {
-        List<UUID> recentIds = productRepository.findRecentProductIdsBefore(lastTimestamp, PageRequest.of(0, limit));
-        return new LinkedHashSet<>(recentIds);
+    public List<Product> getRecentProducts(int limit, Instant lastTimestamp) {
+        List<ProductJpaModel> recentProducts = productRepository.findRecentProductsBefore(lastTimestamp, PageRequest.of(0, limit));
+        List<Product> products = new ArrayList<>();
+        for (ProductJpaModel jpaModel : recentProducts) {
+            products.add(productJpaMapper.toDomain(jpaModel));
+        }
+
+        return products;
     }
 
     @Override

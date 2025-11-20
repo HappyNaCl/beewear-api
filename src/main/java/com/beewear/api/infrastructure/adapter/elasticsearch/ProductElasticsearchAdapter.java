@@ -3,7 +3,6 @@ package com.beewear.api.infrastructure.adapter.elasticsearch;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
-import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.ProductImage;
 import com.beewear.api.domain.entities.enums.Gender;

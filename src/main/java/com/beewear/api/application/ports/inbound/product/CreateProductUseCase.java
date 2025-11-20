@@ -12,7 +12,7 @@ public interface CreateProductUseCase {
     ProductDto createProduct(
             String name,
             String description,
-            double price,
+            Double price,
             Gender forGender,
             ProductCategory productCategory,
             UUID creatorId,

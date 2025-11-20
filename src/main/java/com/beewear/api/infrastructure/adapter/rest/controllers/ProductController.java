@@ -4,7 +4,6 @@ import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
 import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
 import com.beewear.api.application.services.dto.ProductDto;
-import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
 import com.beewear.api.domain.valueobject.ProductImageFile;
@@ -81,8 +80,7 @@ public class ProductController {
             @ModelAttribute CreateProductRequest req,
             @RequestPart("images") List<MultipartFile> images,
             @AuthenticationPrincipal UUID userId
-            ) {
-
+    ) {
         List<ProductImageFile> imageFiles = images.stream().map(image -> {
             try {
                 return ProductImageFile.newUpload(

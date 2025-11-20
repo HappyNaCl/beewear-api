@@ -1,6 +1,5 @@
 package com.beewear.api.application.ports.outbound.documents;
 
-import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;

@@ -1,6 +1,5 @@
 package com.beewear.api.infrastructure.adapter.persistence.repositories;
 
-import com.beewear.api.domain.entities.Subscription;
 import com.beewear.api.domain.entities.User;
 import com.beewear.api.infrastructure.adapter.persistence.models.SubscriptionJpaModel;
 import org.springframework.data.jpa.repository.EntityGraph;
