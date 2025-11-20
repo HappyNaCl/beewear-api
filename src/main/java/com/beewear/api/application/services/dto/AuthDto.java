@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class AuthResult {
+public class AuthDto {
     private final UUID userId;
     private final String email;
     private final String username;
@@ -14,7 +14,7 @@ public class AuthResult {
     private final String accessToken;
     private final String refreshToken;
 
-    public AuthResult(User user, String accessToken, String refreshToken) {
+    public AuthDto(User user, String accessToken, String refreshToken) {
         this.userId = user.getId();
         this.email = user.getEmail();
         this.username = user.getUsername();

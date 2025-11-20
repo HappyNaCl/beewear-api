@@ -1,7 +1,7 @@
 package com.beewear.api.infrastructure.adapter.rest.controllers;
 
 import com.beewear.api.application.ports.inbound.me.GetMeUseCase;
-import com.beewear.api.infrastructure.adapter.rest.mapper.MeResultMapper;
+import com.beewear.api.infrastructure.adapter.rest.mapper.MeResultDto;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
 import com.beewear.api.infrastructure.adapter.rest.responses.MeResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +24,7 @@ public class MeController {
 
     private final GetMeUseCase getMeUseCase;
 
-    private final MeResultMapper meResultMapper;
+    private final MeResultDto meResultMapper;
 
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")

@@ -1,9 +1,9 @@
 package com.beewear.api.application.ports.inbound.me;
 
-import com.beewear.api.application.services.dto.MeResult;
+import com.beewear.api.application.services.dto.MeDto;
 
 import java.util.UUID;
 
 public interface GetMeUseCase {
-    MeResult getMe(UUID userId);
+    MeDto getMe(UUID userId);
 }

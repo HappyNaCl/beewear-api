@@ -4,9 +4,9 @@ import com.beewear.api.application.ports.inbound.auth.CreateOtpUseCase;
 import com.beewear.api.application.ports.inbound.auth.LoginUseCase;
 import com.beewear.api.application.ports.inbound.auth.RefreshTokenUseCase;
 import com.beewear.api.application.ports.inbound.auth.RegisterUseCase;
-import com.beewear.api.application.services.dto.AuthResult;
-import com.beewear.api.application.services.dto.RefreshTokenResult;
-import com.beewear.api.infrastructure.adapter.rest.mapper.RefreshTokenResultMapper;
+import com.beewear.api.application.services.dto.AuthDto;
+import com.beewear.api.application.services.dto.RefreshTokenDto;
+import com.beewear.api.infrastructure.adapter.rest.mapper.RefreshTokenDtoMapper;
 import com.beewear.api.infrastructure.adapter.rest.requests.CreateOtpRequest;
 import com.beewear.api.infrastructure.adapter.rest.requests.LoginRequest;
 import com.beewear.api.infrastructure.adapter.rest.requests.RefreshTokenRequest;
@@ -35,24 +35,24 @@ public class AuthController {
     private final LoginUseCase loginUseCase;
     private final RefreshTokenUseCase refreshTokenUseCase;
 
-    private final RefreshTokenResultMapper refreshTokenResultMapper;
+    private final RefreshTokenDtoMapper refreshTokenResultMapper;
 
     @PostMapping("/login")
     @Operation(summary = "User login with username and password", description = "Gives back user's data and tokens")
-    public ResponseEntity<ApiResponse<AuthResult>> login(@Valid @RequestBody LoginRequest req) {
-        AuthResult res = loginUseCase.login(req.getEmail(), req.getPassword());
+    public ResponseEntity<ApiResponse<AuthDto>> login(@Valid @RequestBody LoginRequest req) {
+        AuthDto res = loginUseCase.login(req.getEmail(), req.getPassword());
         return ResponseEntity.ok(ApiResponse.success(200, res));
     }
 
     @PostMapping("/register")
     @Operation(summary = "User registration with email, username and password", description = "Gives back user's data and tokens")
-    public ResponseEntity<ApiResponse<AuthResult>> register(@Valid @RequestBody RegisterRequest req) {
+    public ResponseEntity<ApiResponse<AuthDto>> register(@Valid @RequestBody RegisterRequest req) {
         if(req.getGender() == null){
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(400, "Gender is required"));
         }
 
-        AuthResult res = registerUseCase.register(
+        AuthDto res = registerUseCase.register(
                 req.getEmail(),
                 req.getUsername(),
                 req.getPassword(),
@@ -73,7 +73,7 @@ public class AuthController {
                     .body(ApiResponse.error(400, "Missing refresh token"));
         }
 
-        RefreshTokenResult result = refreshTokenUseCase.refreshAccessToken(refreshToken);
+        RefreshTokenDto result = refreshTokenUseCase.refreshAccessToken(refreshToken);
 
         RefreshTokenResponse response = refreshTokenResultMapper.toResponse(result);
 

@@ -8,8 +8,8 @@ import com.beewear.api.application.ports.outbound.persistence.UserRepositoryPort
 import com.beewear.api.application.ports.outbound.security.PasswordHasherPort;
 import com.beewear.api.application.ports.outbound.security.TokenProviderPort;
 import com.beewear.api.application.ports.outbound.security.TokenValidatorPort;
-import com.beewear.api.application.services.dto.AuthResult;
-import com.beewear.api.application.services.dto.RefreshTokenResult;
+import com.beewear.api.application.services.dto.AuthDto;
+import com.beewear.api.application.services.dto.RefreshTokenDto;
 import com.beewear.api.domain.entities.User;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.exceptions.*;
@@ -30,7 +30,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
     private final OtpCachePort otpCachePort;
 
     @Override
-    public AuthResult login(String email, String rawPassword) {
+    public AuthDto login(String email, String rawPassword) {
         User user = userRepository.findByEmail(email);
 
         if(!passwordHasher.verifyPassword(rawPassword, user.getPassword())) {
@@ -40,11 +40,11 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
         String accessToken = tokenProvider.createAccessToken(user);
         String refreshToken = tokenProvider.createRefreshToken(user);
 
-        return new AuthResult(user, accessToken, refreshToken);
+        return new AuthDto(user, accessToken, refreshToken);
     }
 
     @Override
-    public AuthResult register(String email, String username, String rawPassword, String confirmPassword, String otp, Gender gender) {
+    public AuthDto register(String email, String username, String rawPassword, String confirmPassword, String otp, Gender gender) {
         String cachedOtp = otpCachePort.getOtp(email);
         cachedOtp = cachedOtp == null ? "242242" : cachedOtp; // TODO: Remove this line after testing
         if(cachedOtp == null) {
@@ -87,7 +87,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
 
         otpCachePort.deactivateOtp(email);
 
-        return new AuthResult(savedUser, accessToken, refreshToken);
+        return new AuthDto(savedUser, accessToken, refreshToken);
     }
 
     private boolean isValidPassword(String password) {
@@ -98,7 +98,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
     }
 
     @Override
-    public RefreshTokenResult refreshAccessToken(String refreshToken) {
+    public RefreshTokenDto refreshAccessToken(String refreshToken) {
         if(!tokenValidator.validateRefreshToken(refreshToken)) {
             throw new UnauthorizedException();
         }
@@ -109,7 +109,7 @@ public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenU
         String newAccessToken = tokenProvider.createAccessToken(user);
         String newRefreshToken = tokenProvider.createRefreshToken(user);
 
-        return RefreshTokenResult.builder()
+        return RefreshTokenDto.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
                 .build();

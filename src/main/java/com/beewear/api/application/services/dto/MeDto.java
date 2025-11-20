@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 @RequiredArgsConstructor
-public class MeResult {
+public class MeDto {
     private final UUID id;
     private final String email;
     private final String username;

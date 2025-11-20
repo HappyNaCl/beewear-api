@@ -1,7 +1,7 @@
 package com.beewear.api.application.ports.inbound.auth;
 
-import com.beewear.api.application.services.dto.AuthResult;
+import com.beewear.api.application.services.dto.AuthDto;
 
 public interface LoginUseCase {
-    AuthResult login(String email, String rawPassword);
+    AuthDto login(String email, String rawPassword);
 }
