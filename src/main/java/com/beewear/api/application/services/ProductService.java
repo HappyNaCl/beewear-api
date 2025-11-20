@@ -1,9 +1,11 @@
 package com.beewear.api.application.services;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
+import com.beewear.api.application.ports.inbound.product.GetProductDetailUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
 import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
 import com.beewear.api.application.ports.outbound.cache.ProductCachePort;
+import com.beewear.api.application.ports.outbound.cache.ProductDetailCachePort;
 import com.beewear.api.application.ports.outbound.cache.RecentProductsCachePort;
 import com.beewear.api.application.ports.outbound.cache.SearchProductCachePort;
 import com.beewear.api.application.ports.outbound.documents.ProductDocumentPort;
@@ -11,6 +13,7 @@ import com.beewear.api.application.ports.outbound.events.ProductEventPublisherPo
 import com.beewear.api.application.ports.outbound.persistence.ProductRepositoryPort;
 import com.beewear.api.application.ports.outbound.s3.ImageUploaderPort;
 import com.beewear.api.application.services.dto.CreatedProductDto;
+import com.beewear.api.application.services.dto.DetailedProductDto;
 import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.entities.enums.Gender;
@@ -18,6 +21,7 @@ import com.beewear.api.domain.entities.enums.ProductCategory;
 import com.beewear.api.domain.events.ProductCreatedEvent;
 import com.beewear.api.domain.exceptions.InvalidProductPriceException;
 import com.beewear.api.domain.exceptions.NoImageException;
+import com.beewear.api.domain.exceptions.ProductNotFoundException;
 import com.beewear.api.domain.valueobject.ProductImageFile;
 import com.beewear.api.domain.valueobject.UploadedImage;
 import jakarta.transaction.Transactional;
@@ -32,13 +36,19 @@ import java.util.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ProductService implements CreateProductUseCase, GetRecentProductsUseCase, SearchProductUseCase {
+public class ProductService implements CreateProductUseCase, GetRecentProductsUseCase,
+        SearchProductUseCase, GetProductDetailUseCase {
     private final ImageUploaderPort imageUploader;
+
     private final ProductRepositoryPort productRepository;
+
     private final ProductDocumentPort productDocumentPort;
+
     private final ProductCachePort productCachePort;
     private final SearchProductCachePort searchProductCachePort;
     private final RecentProductsCachePort recentProductsCachePort;
+    private final ProductDetailCachePort productDetailCachePort;
+
     private final ProductEventPublisherPort productEventPublisher;
 
     @Transactional
@@ -141,7 +151,7 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
             Product p = productsMap.get(id);
 
             if (p == null) {
-                p = productRepository.findById(id);
+                p = productRepository.findById(id).orElse(null);
                 if (p != null) {
                     productCachePort.addProduct(p);
                 }
@@ -184,5 +194,21 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
         }
 
         return getProducts(productIds);
+    }
+
+    @Override
+    public DetailedProductDto getProductDetail(UUID id) {
+        Optional<Product> product = productDetailCachePort.getProductDetail(id);
+        if(product.isPresent()) {
+            return DetailedProductDto.fromProduct(product.get());
+        }
+
+        product = productRepository.findDetailById(id);
+        if(product.isEmpty()) {
+            throw new ProductNotFoundException(id);
+        }
+
+        productDetailCachePort.setProductDetail(product.get());
+        return DetailedProductDto.fromProduct(product.get());
     }
 }

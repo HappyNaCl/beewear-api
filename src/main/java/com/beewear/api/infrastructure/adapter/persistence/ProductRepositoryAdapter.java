@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -74,8 +75,20 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
-    public Product findById(UUID id) {
+    public Optional<Product> findById(UUID id) {
         ProductJpaModel jpaModel =  productRepository.findById(id).orElse(null);
-        return productJpaMapper.toDomain(jpaModel);
+        if (jpaModel == null) {
+            return Optional.empty();
+        }
+        return Optional.of(productJpaMapper.toDomain(jpaModel));
+    }
+
+    @Override
+    public Optional<Product> findDetailById(UUID productId) {
+        ProductJpaModel jpaModel = productRepository.findDetailById(productId);
+        if (jpaModel == null) {
+            return Optional.empty();
+        }
+        return Optional.of(productJpaMapper.toDomain(jpaModel));
     }
 }

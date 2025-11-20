@@ -1,9 +1,11 @@
 package com.beewear.api.infrastructure.adapter.rest.controllers;
 
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
+import com.beewear.api.application.ports.inbound.product.GetProductDetailUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
 import com.beewear.api.application.ports.inbound.product.SearchProductUseCase;
 import com.beewear.api.application.services.dto.CreatedProductDto;
+import com.beewear.api.application.services.dto.DetailedProductDto;
 import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
@@ -35,6 +37,7 @@ public class ProductController {
     private final CreateProductUseCase createProductUseCase;
     private final GetRecentProductsUseCase getRecentProductsUseCase;
     private final SearchProductUseCase searchProductUseCase;
+    private final GetProductDetailUseCase getProductDetailUseCase;
 
     @GetMapping("/recent")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getRecentProducts(
@@ -105,9 +108,9 @@ public class ProductController {
 
         return ResponseEntity.ok(ApiResponse.success(201, dto));
     }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ApiResponse<ProductDto>> getProduct(@PathVariable UUID id) {
-//
-//    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<DetailedProductDto>> getProduct(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.success(200, getProductDetailUseCase.getProductDetail(id)));
+    }
 }

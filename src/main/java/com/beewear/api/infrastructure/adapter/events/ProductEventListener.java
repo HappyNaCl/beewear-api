@@ -19,7 +19,7 @@ public class ProductEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleProductCreatedEvent(ProductCreatedEvent event) {
-        Product product = productRepositoryPort.findById(event.getProductId());
+        Product product = productRepositoryPort.findById(event.getProductId()).get();
         productCachePort.addProduct(product);
         recentProductsCachePort.addProduct(
                 product.getId().toString(),

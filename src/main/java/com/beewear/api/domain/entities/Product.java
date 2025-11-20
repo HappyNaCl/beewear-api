@@ -2,6 +2,7 @@ package com.beewear.api.domain.entities;
 
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
+import com.beewear.api.domain.entities.enums.ProductStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class Product {
     private double price;
     private Gender forGender;
     private ProductCategory productCategory;
+    private ProductStatus status;
 
     private User creator;
     private List<ProductImage> productImages;

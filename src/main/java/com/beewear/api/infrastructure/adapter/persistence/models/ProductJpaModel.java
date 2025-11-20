@@ -58,7 +58,7 @@ public class ProductJpaModel {
     private ProductCategory productCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id", nullable = false)
+    @JoinColumn(name = "creator_id")
     private UserJpaModel creator;
 
     @OneToMany(

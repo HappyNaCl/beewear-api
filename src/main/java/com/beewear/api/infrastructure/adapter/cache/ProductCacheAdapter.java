@@ -25,17 +25,12 @@ public class ProductCacheAdapter implements ProductCachePort {
 
     @Override
     public void removeProduct(UUID productId) {
-
+        redisTemplate.delete(CACHE_KEY + productId.toString());
     }
 
     @Override
     public void updateProduct(Product product) {
 
-    }
-
-    @Override
-    public Product getProduct(UUID productId) {
-        return null;
     }
 
     @Override

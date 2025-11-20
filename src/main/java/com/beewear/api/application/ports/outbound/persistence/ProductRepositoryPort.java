@@ -5,6 +5,7 @@ import com.beewear.api.domain.valueobject.UploadedImage;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProductRepositoryPort {
@@ -12,5 +13,6 @@ public interface ProductRepositoryPort {
     Product updateImageUrls(Product product, List<UploadedImage> uploadedImages);
     List<Product> getRecentProducts(int limit);
     List<Product> getRecentProducts(int limit, Instant lastTimestamp);
-    Product findById(UUID id);
+    Optional<Product> findById(UUID id);
+    Optional<Product> findDetailById(UUID id);
 }

@@ -66,7 +66,7 @@ public class DummyDataSeeder implements CommandLineRunner {
 
         productElasticsearchRepository.deleteAll();
 
-        int productCount = 250;
+        int productCount = 750;
 
         for(int i = 0; i < productCount; i++) {
             ProductJpaModel product = new ProductJpaModel();
