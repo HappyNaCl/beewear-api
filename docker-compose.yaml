@@ -13,6 +13,7 @@ services:
       - postgres
       - rabbitmq
       - redis
+      - elasticsearch
     networks:
       - network
 

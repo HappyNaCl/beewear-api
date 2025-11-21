@@ -30,7 +30,7 @@ public class MeService implements GetMeUseCase {
                 user.getEmail(),
                 user.getUsername(),
                 user.getProfilePicture(),
-                subscription.getSubscriptionPlan() != null ?
+                subscription != null ?
                         subscription.getSubscriptionPlan().getName() : null
         );
     }
