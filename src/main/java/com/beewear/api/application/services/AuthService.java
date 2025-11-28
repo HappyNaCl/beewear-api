@@ -1,5 +1,6 @@
 package com.beewear.api.application.services;
 
+import com.beewear.api.application.ports.inbound.auth.ChangePasswordUseCase;
 import com.beewear.api.application.ports.inbound.auth.LoginUseCase;
 import com.beewear.api.application.ports.inbound.auth.RefreshTokenUseCase;
 import com.beewear.api.application.ports.inbound.auth.RegisterUseCase;
@@ -21,7 +22,8 @@ import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
-public class AuthService implements LoginUseCase, RegisterUseCase, RefreshTokenUseCase {
+public class AuthService implements LoginUseCase, RegisterUseCase,
+        RefreshTokenUseCase, ChangePasswordUseCase {
 
     private final UserRepositoryPort userRepository;
     private final PasswordHasherPort passwordHasher;

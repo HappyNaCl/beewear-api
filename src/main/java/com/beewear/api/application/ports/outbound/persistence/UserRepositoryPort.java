@@ -8,7 +8,7 @@ public interface UserRepositoryPort {
 
     User findByEmail(String email);
     User findById(UUID id);
-
+    User update(User user);
     boolean existsByEmail(String email);
 
     User save(User user);

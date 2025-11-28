@@ -6,13 +6,11 @@ import com.beewear.api.application.ports.inbound.auth.RefreshTokenUseCase;
 import com.beewear.api.application.ports.inbound.auth.RegisterUseCase;
 import com.beewear.api.application.services.dto.AuthDto;
 import com.beewear.api.application.services.dto.RefreshTokenDto;
-import com.beewear.api.infrastructure.adapter.rest.mapper.RefreshTokenDtoMapper;
 import com.beewear.api.infrastructure.adapter.rest.requests.CreateOtpRequest;
 import com.beewear.api.infrastructure.adapter.rest.requests.LoginRequest;
 import com.beewear.api.infrastructure.adapter.rest.requests.RefreshTokenRequest;
 import com.beewear.api.infrastructure.adapter.rest.requests.RegisterRequest;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
-import com.beewear.api.infrastructure.adapter.rest.responses.RefreshTokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -34,8 +32,6 @@ public class AuthController {
     private final RegisterUseCase registerUseCase;
     private final LoginUseCase loginUseCase;
     private final RefreshTokenUseCase refreshTokenUseCase;
-
-    private final RefreshTokenDtoMapper refreshTokenResultMapper;
 
     @PostMapping("/login")
     @Operation(summary = "User login with username and password", description = "Gives back user's data and tokens")
@@ -65,7 +61,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     @Operation(summary = "Refresh access token using refresh token", description = "Gives back new access token and refresh token")
-    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(@RequestBody @Valid RefreshTokenRequest req) {
+    public ResponseEntity<ApiResponse<RefreshTokenDto>> refreshToken(@RequestBody @Valid RefreshTokenRequest req) {
         String refreshToken = req.getRefreshToken();
 
         if (refreshToken == null || refreshToken.isBlank()) {
@@ -75,9 +71,7 @@ public class AuthController {
 
         RefreshTokenDto result = refreshTokenUseCase.refreshAccessToken(refreshToken);
 
-        RefreshTokenResponse response = refreshTokenResultMapper.toResponse(result);
-
-        return ResponseEntity.ok(ApiResponse.success(200, response));
+        return ResponseEntity.ok(ApiResponse.success(200, result));
     }
 
     @PostMapping("/otp/create")

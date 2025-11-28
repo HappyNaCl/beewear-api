@@ -38,6 +38,29 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public User update(User user) {
+        UserJpaModel model = repository.findById(user.getId())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(user.getDisplayName() != null) {
+            model.setDisplayName(user.getDisplayName());
+        }
+        if(user.getPhoneNumber() != null) {
+            model.setPhoneNumber(user.getPhoneNumber());
+        }
+        if(user.getBio() != null) {
+            model.setBio(user.getBio());
+        }
+        if(user.getProfilePicture() != null) {
+            model.setProfilePicture(user.getProfilePicture());
+        }
+
+        UserJpaModel updatedModel = repository.save(model);
+
+        return userJpaMapper.toDomain(updatedModel);
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return repository.existsByEmail(email);
     }

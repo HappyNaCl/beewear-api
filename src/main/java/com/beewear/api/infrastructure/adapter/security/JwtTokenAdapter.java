@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
-public class JwtTokenProvider implements TokenProviderPort {
+public class JwtTokenAdapter implements TokenProviderPort {
 
     private final JwtProperties jwtProperties;
 

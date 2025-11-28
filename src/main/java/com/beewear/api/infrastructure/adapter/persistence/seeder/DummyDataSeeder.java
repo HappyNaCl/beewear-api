@@ -39,8 +39,12 @@ public class DummyDataSeeder implements CommandLineRunner {
     private final Random random = new Random();
 
     private void seedUser() {
-        int userCount = 50;
+        if(userRepository.count() > 0) {
+            System.out.println("Users already exist, skipping seeding.");
+            return;
+        }
 
+        int userCount = 50;
 
         for(int i = 0; i < userCount; i++) {
             UserJpaModel user = new UserJpaModel();

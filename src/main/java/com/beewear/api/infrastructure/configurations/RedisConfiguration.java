@@ -1,6 +1,7 @@
 package com.beewear.api.infrastructure.configurations;
 
 import com.beewear.api.domain.entities.Product;
+import com.beewear.api.domain.entities.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,22 @@ public class RedisConfiguration {
         template.setConnectionFactory(connectionFactory);
 
         Jackson2JsonRedisSerializer<Product> serializer = new Jackson2JsonRedisSerializer<>(Product.class);
+        serializer.setObjectMapper(objectMapper);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+
+        return template;
+    }
+
+    @Bean RedisTemplate<String, User> userRedisTemplate(
+            RedisConnectionFactory connectionFactory,
+            ObjectMapper objectMapper
+    ) {
+        RedisTemplate<String, User> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        Jackson2JsonRedisSerializer<User> serializer = new Jackson2JsonRedisSerializer<>(User.class);
         serializer.setObjectMapper(objectMapper);
 
         template.setKeySerializer(new StringRedisSerializer());

@@ -20,6 +20,9 @@ public class User {
     private String email;
     private String password;
     private String profilePicture;
+    private String phoneNumber;
+    private String bio;
+    private String displayName;
     private Gender gender;
 
     private List<Subscription> subscriptions;

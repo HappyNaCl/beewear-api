@@ -32,6 +32,12 @@ public class UserJpaModel {
     @Column(nullable = false)
     private String username;
 
+    private @Nullable String phoneNumber;
+
+    private @Nullable String bio;
+
+    private @Nullable String displayName;
+
     private @Nullable String password;
 
     private @Nullable String profilePicture;
