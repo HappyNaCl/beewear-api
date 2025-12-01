@@ -18,4 +18,18 @@ public record UserImageFile(String fileName, byte[] data, UUID userId) {
     public static UserImageFile newUpload(String originalFileName, byte[] data, UUID userId) {
         return new UserImageFile(originalFileName, data, userId);
     }
+
+    private static String generateUniqueFileName(String originalFileName) {
+        if (originalFileName == null || originalFileName.isEmpty()) {
+            return "profile";
+        }
+
+        int lastDotIndex = originalFileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+            String extension = originalFileName.substring(lastDotIndex);
+            return "profile" + extension;
+        }
+
+        return "profile";
+    }
 }

@@ -36,6 +36,18 @@ public class UserService implements GetUserDetailUseCase, UpdateUserUseCase {
     @Override
     public UserDto updateUser(UUID id, UserImageFile profilePicture, String phoneNumber, String bio, String displayName) {
 
+        if(bio.length() > 300) {
+            throw new IllegalArgumentException("Bio cannot be longer than 300 characters");
+        }
+
+        if(phoneNumber.length() < 10) {
+            throw new IllegalArgumentException("Phone number must be more than 10 digits");
+        }
+
+        if(displayName.length() <= 6 || displayName.length() > 30) {
+            throw new IllegalArgumentException("Display name must be between 6 and 30 characters");
+        }
+
         UploadedImage uploadedProfilePicture = null;
         if(profilePicture != null) {
             uploadedProfilePicture = imageUploader.uploadImage(profilePicture.fileName(),

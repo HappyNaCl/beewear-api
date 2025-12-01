@@ -41,8 +41,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.error(403, "Forbidden"));
         }
+
         UserImageFile userImageFile = null;
         if (imageFile != null && !imageFile.isEmpty()) {
+            if(imageFile.getContentType() != null &&
+                    !imageFile.getContentType().startsWith("image/")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error(400, "Invalid image file"));
+            }
+
             try {
                  userImageFile = UserImageFile.newUpload(
                         imageFile.getOriginalFilename(),

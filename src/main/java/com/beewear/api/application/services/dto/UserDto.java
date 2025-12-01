@@ -28,6 +28,7 @@ public class UserDto {
                 .phoneNumber(user.getPhoneNumber())
                 .bio(user.getBio())
                 .displayName(user.getDisplayName())
+                .gender(user.getGender())
                 .build();
     }
 }

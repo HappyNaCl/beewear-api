@@ -9,6 +9,7 @@ import com.beewear.api.application.services.dto.DetailedProductDto;
 import com.beewear.api.application.services.dto.ProductDto;
 import com.beewear.api.domain.entities.enums.Gender;
 import com.beewear.api.domain.entities.enums.ProductCategory;
+import com.beewear.api.domain.exceptions.NotImageException;
 import com.beewear.api.domain.valueobject.ProductImageFile;
 import com.beewear.api.infrastructure.adapter.rest.requests.CreateProductRequest;
 import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -87,12 +89,19 @@ public class ProductController {
     ) {
         List<ProductImageFile> imageFiles = images.stream().map(image -> {
             try {
+                if(image.getContentType() != null &&
+                        !image.getContentType().startsWith("image/")) {
+                    throw new NotImageException();
+                }
+
                 return ProductImageFile.newUpload(
                         image.getOriginalFilename(),
                         image.getBytes()
                 );
             } catch (IOException e) {
                 throw new UncheckedIOException("Failed to read uploaded image bytes", e);
+            } catch (NotImageException e) {
+                throw new NotImageException();
             }
         }).toList();
 
