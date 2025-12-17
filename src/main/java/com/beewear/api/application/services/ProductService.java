@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import com.beewear.api.domain.entities.enums.ProductStatus;
 
 import java.time.Instant;
 import java.util.*;
@@ -53,10 +54,11 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
 
     @Transactional
     @Override
-    public CreatedProductDto createProduct(String name, String description,
-                                           Double price, Gender forGender,
-                                           ProductCategory productCategory,
-                                           UUID creatorId, List<ProductImageFile> images) {
+    public CreatedProductDto createProduct(
+        String name, String description,
+        Double price, Gender forGender,
+        ProductCategory productCategory,
+            UUID creatorId, List<ProductImageFile> images) {
 
         if(images.isEmpty()) {
             throw new NoImageException();
@@ -73,6 +75,7 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
                 .forGender(forGender)
                 .productCategory(productCategory)
                 .creatorId(creatorId)
+                .status(ProductStatus.ACTIVE)
                 .build();
 
         Product savedProduct = productRepository.save(product);
