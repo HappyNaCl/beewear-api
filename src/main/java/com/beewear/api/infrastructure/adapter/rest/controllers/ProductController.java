@@ -1,5 +1,10 @@
 package com.beewear.api.infrastructure.adapter.rest.controllers;
 
+import com.beewear.api.domain.entities.User;
+import com.beewear.api.application.services.ProductService;
+import com.beewear.api.application.services.dto.UserStatsDto;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.beewear.api.application.ports.inbound.product.CreateProductUseCase;
 import com.beewear.api.application.ports.inbound.product.GetProductDetailUseCase;
 import com.beewear.api.application.ports.inbound.product.GetRecentProductsUseCase;
@@ -16,6 +21,8 @@ import com.beewear.api.infrastructure.adapter.rest.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.beewear.api.application.services.dto.UserStatsDto;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +47,8 @@ public class ProductController {
     private final GetRecentProductsUseCase getRecentProductsUseCase;
     private final SearchProductUseCase searchProductUseCase;
     private final GetProductDetailUseCase getProductDetailUseCase;
+
+    private final ProductService productService;
 
     @GetMapping("/recent")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getRecentProducts(
@@ -121,5 +130,17 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DetailedProductDto>> getProduct(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(200, getProductDetailUseCase.getProductDetail(id)));
+    }
+
+    @GetMapping("/me/stats")
+    public ResponseEntity<ApiResponse<UserStatsDto>> getMyStats(@AuthenticationPrincipal UUID userId) {
+        UserStatsDto stats = productService.getUserStats(userId);
+        return ResponseEntity.ok(ApiResponse.success(200, stats));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getMyProducts(@AuthenticationPrincipal UUID userId) {
+        List<ProductDto> products = productService.getMyProducts(userId);
+        return ResponseEntity.ok(ApiResponse.success(200, products));
     }
 }

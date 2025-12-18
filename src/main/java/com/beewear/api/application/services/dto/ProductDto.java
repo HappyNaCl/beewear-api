@@ -21,6 +21,7 @@ public class ProductDto {
     private UUID creatorId;
     private ProductStatus status;
     private Instant createdAt;
+    private String description;
 
 
     public static ProductDto fromProduct(Product product) {

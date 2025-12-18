@@ -27,6 +27,8 @@ import com.beewear.api.domain.valueobject.UploadedImage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.beewear.api.application.services.dto.UserStatsDto;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import com.beewear.api.domain.entities.enums.ProductStatus;
@@ -213,5 +215,18 @@ public class ProductService implements CreateProductUseCase, GetRecentProductsUs
 
         productDetailCachePort.setProductDetail(product.get());
         return DetailedProductDto.fromProduct(product.get());
+    }
+
+    public UserStatsDto getUserStats(UUID userId) {
+        long sold = productRepository.countByCreatorIdAndStatus(userId, ProductStatus.SOLD);
+        long active = productRepository.countByCreatorIdAndStatus(userId, ProductStatus.ACTIVE);
+        return new UserStatsDto(sold, active);
+    }
+
+    public List<ProductDto> getMyProducts(UUID userId) {
+        return productRepository.findByCreatorId(userId)
+                .stream()
+                .map(ProductDto::fromProduct)
+                .toList();
     }
 }

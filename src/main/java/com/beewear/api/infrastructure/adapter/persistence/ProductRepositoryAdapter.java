@@ -7,6 +7,7 @@ import com.beewear.api.infrastructure.adapter.persistence.mappers.ProductJpaMapp
 import com.beewear.api.infrastructure.adapter.persistence.models.ProductImageJpaModel;
 import com.beewear.api.infrastructure.adapter.persistence.models.ProductJpaModel;
 import com.beewear.api.infrastructure.adapter.persistence.repositories.SpringProductRepository;
+import com.beewear.api.domain.entities.enums.ProductStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -90,5 +91,18 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
             return Optional.empty();
         }
         return Optional.of(productJpaMapper.toDomain(jpaModel));
+    }
+
+    @Override
+    public List<Product> findByCreatorId(UUID creatorId) {
+        return productRepository.findByCreatorIdOrderByCreatedAtDesc(creatorId)
+                .stream()
+                .map(productJpaMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public long countByCreatorIdAndStatus(UUID creatorId, ProductStatus status) {
+        return productRepository.countByCreatorIdAndStatus(creatorId, status);
     }
 }

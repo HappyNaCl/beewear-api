@@ -1,5 +1,5 @@
 package com.beewear.api.application.ports.outbound.persistence;
-
+import com.beewear.api.domain.entities.enums.ProductStatus;
 import com.beewear.api.domain.entities.Product;
 import com.beewear.api.domain.valueobject.UploadedImage;
 
@@ -15,4 +15,6 @@ public interface ProductRepositoryPort {
     List<Product> getRecentProducts(int limit, Instant lastTimestamp);
     Optional<Product> findById(UUID id);
     Optional<Product> findDetailById(UUID id);
+    List<Product> findByCreatorId(UUID creatorId);
+    long countByCreatorIdAndStatus(UUID creatorId, ProductStatus status);
 }
